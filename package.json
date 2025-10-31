@@ -1,0 +1,26 @@
+{
+  "name": "com.web2wave.web2wave",
+  "version": "1.1.1",
+  "displayName": "Web2Wave",
+  "description": "Web2Wave is a lightweight Unity package that provides a simple interface for managing user subscriptions and properties through a REST API.",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "keywords": [
+    "web2wave",
+    "subscription",
+    "paywall",
+    "api"
+  ],
+  "author": {
+    "name": "Web2Wave",
+    "email": "support@web2wave.com",
+    "url": "https://web2wave.com"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/web2wave/web2wave_unity.git"
+  }
+}
