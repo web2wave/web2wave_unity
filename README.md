@@ -7,7 +7,7 @@ Web2Wave is a lightweight Unity package that provides a simple interface for man
 - Fetch subscription status for users
 - Check for active subscriptions
 - Manage user properties
-- Identify web2wave user via device fingerprinting
+- web2wave deferred deeplinks via `Identify()`
 - Set third-party profiles (Adapty, RevenueCat, Qonversion)
 - WebView integration for quizzes and landing pages
 - Thread-safe singleton design
@@ -159,9 +159,9 @@ Web2Wave.Shared.UpdateUserProperty(
 );
 ```
 
-### Identify web2wave user
+### web2wave deferred deeplinks
 
-The `Identify()` method identifies a user using device fingerprinting and returns identification metadata including the `user_id`. Use it as an **alternative to MMP attribution** (AppsFlyer, Adjust, Branch, etc.) when you do not run those tools — call it on first app launch instead of reading an install deeplink.
+The `Identify()` method resolves a web2wave user via **deferred deeplinks** and returns identification metadata including the `user_id`. Use it as an **alternative to MMP attribution** (AppsFlyer, Adjust, Branch, etc.) when you do not run those tools — call it on first app launch instead of reading an install deeplink.
 
 ```csharp
 Web2Wave.Shared.Identify(
@@ -349,7 +349,7 @@ Set Qonversion ProfileID.
 
 ##### `void Identify(Action<IdentifyResponse> onSuccess, Action<string> onError)`
 
-Identifies a user using the device fingerprint. Alternative to MMP-based deeplink attribution.
+Resolves a user via web2wave deferred deeplinks. Alternative to MMP-based deeplink attribution.
 
 ### `Web2WaveWebView.Instance`
 
