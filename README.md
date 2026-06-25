@@ -161,7 +161,7 @@ Web2Wave.Shared.UpdateUserProperty(
 
 ### Identify web2wave user
 
-The `Identify()` method identifies a user using device fingerprinting and returns identification metadata including the `user_id`. Use it when a deeplink is unavailable.
+The `Identify()` method identifies a user using device fingerprinting and returns identification metadata including the `user_id`. Use it as an **alternative to MMP attribution** (AppsFlyer, Adjust, Branch, etc.) when you do not run those tools — call it on first app launch instead of reading an install deeplink.
 
 ```csharp
 Web2Wave.Shared.Identify(
@@ -349,7 +349,7 @@ Set Qonversion ProfileID.
 
 ##### `void Identify(Action<IdentifyResponse> onSuccess, Action<string> onError)`
 
-Identifies a user using the device fingerprint and returns identification metadata.
+Identifies a user using the device fingerprint. Alternative to MMP-based deeplink attribution.
 
 ### `Web2WaveWebView.Instance`
 
