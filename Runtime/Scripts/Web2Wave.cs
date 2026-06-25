@@ -42,9 +42,50 @@ namespace Web2Wave
                 {
                     { "api-key", _apiKey },
                     { "Cache-Control", "no-cache" },
-                    { "Pragma", "no-cache" }
+                    { "Pragma", "no-cache" },
+                    { "platform", GetPlatform() },
+                    { "screen_size", GetScreenSize() },
+                    { "timezone", GetTimezone() },
+                    { "os_version", GetOSVersion() }
                 };
             }
+        }
+
+        private static string GetPlatform()
+        {
+#if UNITY_IOS
+            return "iOS";
+#elif UNITY_ANDROID
+            return "Android";
+#else
+            return "Other";
+#endif
+        }
+
+        private static string GetScreenSize()
+        {
+            return $"{Screen.width}x{Screen.height}";
+        }
+
+        private static string GetTimezone()
+        {
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            var totalMinutes = (int)offset.TotalMinutes;
+            var hours = totalMinutes / 60;
+            var minutes = Math.Abs(totalMinutes % 60);
+            var sign = hours >= 0 ? "+" : "-";
+            return $"UTC{sign}{Math.Abs(hours):D2}:{minutes:D2}";
+        }
+
+        private static string GetOSVersion()
+        {
+#if UNITY_IOS
+            return $"iOS {UnityEngine.iOS.Device.systemVersion}";
+#elif UNITY_ANDROID
+            return $"Android {SystemInfo.operatingSystem}";
+#else
+            return SystemInfo.operatingSystem;
+#endif
         }
 
         public void Initialize(string apiKey)
@@ -430,6 +471,45 @@ namespace Web2Wave
         public void SetQonversionProfileID(string web2waveUserId, string qonversionProfileId, System.Action<Web2WaveResponse> onComplete)
         {
             UpdateUserProperty(web2waveUserId, "qonversion_profile_id", qonversionProfileId, onComplete);
+        }
+
+        public void Identify(System.Action<IdentifyResponse> onSuccess, System.Action<string> onError)
+        {
+            StartCoroutine(IdentifyCoroutine(onSuccess, onError));
+        }
+
+        private IEnumerator IdentifyCoroutine(System.Action<IdentifyResponse> onSuccess, System.Action<string> onError)
+        {
+            string url = $"{BaseURL}/api/user/identify";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                foreach (var header in Headers)
+                {
+                    request.SetRequestHeader(header.Key, header.Value);
+                }
+
+                yield return request.SendWebRequest();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    try
+                    {
+                        IdentifyResponse response = JsonConvert.DeserializeObject<IdentifyResponse>(request.downloadHandler.text);
+                        onSuccess?.Invoke(response);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Failed to parse identify response: {e.Message}");
+                        onError?.Invoke("Failed to parse response");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"Failed to identify user: {request.error}");
+                    onError?.Invoke(request.error);
+                }
+            }
         }
     }
 }

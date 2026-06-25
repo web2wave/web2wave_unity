@@ -43,6 +43,15 @@ namespace Web2Wave
         public List<UserProperty> properties;
     }
 
+    [Serializable]
+    public class IdentifyResponse
+    {
+        public int success;
+        public string user_id;
+        public string match_method;
+        public string platform;
+    }
+
     public interface IWeb2WaveWebListener
     {
         void OnEvent(string eventName, Dictionary<string, object> data = null);

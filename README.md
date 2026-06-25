@@ -7,6 +7,7 @@ Web2Wave is a lightweight Unity package that provides a simple interface for man
 - Fetch subscription status for users
 - Check for active subscriptions
 - Manage user properties
+- Identify web2wave user via device fingerprinting
 - Set third-party profiles (Adapty, RevenueCat, Qonversion)
 - WebView integration for quizzes and landing pages
 - Thread-safe singleton design
@@ -156,6 +157,43 @@ Web2Wave.Shared.UpdateUserProperty(
         }
     }
 );
+```
+
+### Identify web2wave user
+
+The `Identify()` method identifies a user using device fingerprinting and returns identification metadata including the `user_id`. Use it when a deeplink is unavailable.
+
+```csharp
+Web2Wave.Shared.Identify(
+    onSuccess: (identificationData) =>
+    {
+        if (identificationData.success == 1 && !string.IsNullOrEmpty(identificationData.user_id))
+        {
+            Debug.Log($"Identified user: {identificationData.user_id}");
+
+            Web2Wave.Shared.SetAdaptyProfileID(
+                identificationData.user_id,
+                "adaptyProfileID",
+                onComplete: (_) => { }
+            );
+        }
+    },
+    onError: (error) =>
+    {
+        Debug.LogError($"Failed to identify user: {error}");
+    }
+);
+```
+
+**Response format:**
+
+```json
+{
+  "success": 1,
+  "user_id": "identified_user_guid",
+  "match_method": "match_method_used",
+  "platform": "iOS"
+}
 ```
 
 ### Managing Third-Party Profiles
@@ -308,6 +346,10 @@ Set Adapty profileID.
 ##### `void SetQonversionProfileID(string web2waveUserId, string qonversionProfileId, Action<Web2WaveResponse> onComplete)`
 
 Set Qonversion ProfileID.
+
+##### `void Identify(Action<IdentifyResponse> onSuccess, Action<string> onError)`
+
+Identifies a user using the device fingerprint and returns identification metadata.
 
 ### `Web2WaveWebView.Instance`
 
