@@ -38,7 +38,7 @@ namespace Web2Wave
                 {
                     throw new Exception("You must initialize apiKey before use");
                 }
-                return new Dictionary<string, string>
+                var headers = new Dictionary<string, string>
                 {
                     { "api-key", _apiKey },
                     { "Cache-Control", "no-cache" },
@@ -48,6 +48,12 @@ namespace Web2Wave
                     { "timezone", GetTimezone() },
                     { "os_version", GetOSVersion() }
                 };
+                var deviceModel = GetDeviceModel();
+                if (!string.IsNullOrEmpty(deviceModel))
+                {
+                    headers["device_model"] = deviceModel;
+                }
+                return headers;
             }
         }
 
@@ -86,6 +92,27 @@ namespace Web2Wave
 #else
             return SystemInfo.operatingSystem;
 #endif
+        }
+
+        /// <summary>
+        /// Device model for fingerprinting (e.g. Android Build.MODEL / iOS machine id).
+        /// </summary>
+        private static string GetDeviceModel()
+        {
+            var model = SystemInfo.deviceModel;
+            if (string.IsNullOrWhiteSpace(model))
+            {
+                return null;
+            }
+            model = model.Trim();
+            // Unity sometimes returns "unknown" / "generic" placeholders
+            if (model.Equals("unknown", StringComparison.OrdinalIgnoreCase) ||
+                model.Equals("generic", StringComparison.OrdinalIgnoreCase) ||
+                model.Equals("system product name", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+            return model;
         }
 
         public void Initialize(string apiKey)

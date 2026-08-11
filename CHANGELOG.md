@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Send `device_model` header for identify fingerprinting (`SystemInfo.deviceModel`)
+
 ## 1.1.1
 
 - Initial Unity version
