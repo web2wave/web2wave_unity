@@ -500,6 +500,16 @@ namespace Web2Wave
             UpdateUserProperty(web2waveUserId, "qonversion_profile_id", qonversionProfileId, onComplete);
         }
 
+        public void SetApphudProfileID(string web2waveUserId, string apphudProfileId, System.Action<Web2WaveResponse> onComplete)
+        {
+            UpdateUserProperty(web2waveUserId, "apphud_profile_id", apphudProfileId, onComplete);
+        }
+
+        public void SetSuperwallProfileID(string web2waveUserId, string superwallProfileId, System.Action<Web2WaveResponse> onComplete)
+        {
+            UpdateUserProperty(web2waveUserId, "superwall_profile_id", superwallProfileId, onComplete);
+        }
+
         public void Identify(System.Action<IdentifyResponse> onSuccess, System.Action<string> onError)
         {
             StartCoroutine(IdentifyCoroutine(onSuccess, onError));
