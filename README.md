@@ -8,7 +8,7 @@ Web2Wave is a lightweight Unity package that provides a simple interface for man
 - Check for active subscriptions
 - Manage user properties
 - web2wave deferred deeplinks via `Identify()`
-- Set third-party profiles (Adapty, RevenueCat, Qonversion)
+- Set third-party profiles (Adapty, RevenueCat, Qonversion, Apphud, Superwall)
 - WebView integration for quizzes and landing pages
 - Thread-safe singleton design
 - Callback-based API
@@ -237,6 +237,32 @@ Web2Wave.Shared.SetQonversionProfileID(
         }
     }
 );
+
+// Save Apphud profileID
+Web2Wave.Shared.SetApphudProfileID(
+    "userID",
+    "apphudProfileID",
+    onComplete: (response) =>
+    {
+        if (response.IsSuccess)
+        {
+            Debug.Log("Apphud profileID saved");
+        }
+    }
+);
+
+// Save Superwall profileID (Superwall userId after identify())
+Web2Wave.Shared.SetSuperwallProfileID(
+    "userID",
+    "superwallProfileID",
+    onComplete: (response) =>
+    {
+        if (response.IsSuccess)
+        {
+            Debug.Log("Superwall profileID saved");
+        }
+    }
+);
 ```
 
 ### Working with Quiz or Landing Web Page
@@ -346,6 +372,14 @@ Set Adapty profileID.
 ##### `void SetQonversionProfileID(string web2waveUserId, string qonversionProfileId, Action<Web2WaveResponse> onComplete)`
 
 Set Qonversion ProfileID.
+
+##### `void SetApphudProfileID(string web2waveUserId, string apphudProfileId, Action<Web2WaveResponse> onComplete)`
+
+Set Apphud ProfileID.
+
+##### `void SetSuperwallProfileID(string web2waveUserId, string superwallProfileId, Action<Web2WaveResponse> onComplete)`
+
+Set Superwall ProfileID.
 
 ##### `void Identify(Action<IdentifyResponse> onSuccess, Action<string> onError)`
 
