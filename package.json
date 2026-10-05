@@ -1,6 +1,6 @@
 {
   "name": "com.web2wave.web2wave",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "displayName": "Web2Wave",
   "description": "Web2Wave is a lightweight Unity package that provides a simple interface for managing user subscriptions and properties through a REST API.",
   "unity": "2020.3",
