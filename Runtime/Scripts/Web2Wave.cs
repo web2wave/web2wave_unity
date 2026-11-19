@@ -123,7 +123,7 @@ namespace Web2Wave
         private IEnumerator FetchSubscriptionStatusCoroutine(
             string web2waveUserId,
             System.Action<SubscriptionResponse> onSuccess,
-            System.Action onError)
+            System.Action<string> onError)
         {
             string url = $"{BaseURL}/api/user/subscriptions?user={Uri.EscapeDataString(web2waveUserId)}";
             
@@ -146,13 +146,14 @@ namespace Web2Wave
                     catch (Exception e)
                     {
                         Debug.LogError($"Failed to parse subscription response: {e.Message}");
-                        onError?.Invoke();
+                        onError?.Invoke("Failed to parse response");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"Failed to fetch subscriptions: {request.error}");
-                    onError?.Invoke();
+                    string errorMsg = Web2WaveHelpers.ExtractErrorMessage(request.downloadHandler?.text, request.error);
+                    Debug.LogError($"Failed to fetch subscriptions: {errorMsg}");
+                    onError?.Invoke(errorMsg);
                 }
             }
         }
@@ -165,7 +166,7 @@ namespace Web2Wave
                 {
                     onSuccess?.Invoke(response?.subscription);
                 },
-                () => onError?.Invoke("Failed to fetch subscriptions")));
+                error => onError?.Invoke(error)));
         }
 
         public void HasActiveSubscription(string web2waveUserId, System.Action<bool> onSuccess, System.Action<string> onError)
@@ -184,7 +185,7 @@ namespace Web2Wave
                         onSuccess?.Invoke(false);
                     }
                 },
-                () => onError?.Invoke("Failed to check subscription status")));
+                error => onError?.Invoke(error)));
         }
 
         public void ChargeUser(string web2waveUserId, int priceId, System.Action<Web2WaveResponse> onComplete)
@@ -216,32 +217,10 @@ namespace Web2Wave
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        bool isSuccess = result.ContainsKey("success") && result["success"]?.ToString() == "1";
-                        onComplete?.Invoke(new Web2WaveResponse(isSuccess));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, "Failed to parse response"));
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        string errorMsg = result.ContainsKey("message") ? result["message"].ToString() : request.error;
-                        onComplete?.Invoke(new Web2WaveResponse(false, errorMsg));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, request.error));
-                    }
-                }
+                onComplete?.Invoke(Web2WaveHelpers.ParseActionResponse(
+                    request.downloadHandler?.text,
+                    request.result == UnityWebRequest.Result.Success,
+                    request.error));
             }
         }
 
@@ -278,32 +257,10 @@ namespace Web2Wave
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        bool isSuccess = result.ContainsKey("success") && result["success"]?.ToString() == "1";
-                        onComplete?.Invoke(new Web2WaveResponse(isSuccess));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, "Failed to parse response"));
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        string errorMsg = result.ContainsKey("error_msg") ? result["error_msg"].ToString() : request.error;
-                        onComplete?.Invoke(new Web2WaveResponse(false, errorMsg));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, request.error));
-                    }
-                }
+                onComplete?.Invoke(Web2WaveHelpers.ParseActionResponse(
+                    request.downloadHandler?.text,
+                    request.result == UnityWebRequest.Result.Success,
+                    request.error));
             }
         }
 
@@ -341,32 +298,10 @@ namespace Web2Wave
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        bool isSuccess = result.ContainsKey("success") && result["success"]?.ToString() == "1";
-                        onComplete?.Invoke(new Web2WaveResponse(isSuccess));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, "Failed to parse response"));
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        string errorMsg = result.ContainsKey("error_msg") ? result["error_msg"].ToString() : request.error;
-                        onComplete?.Invoke(new Web2WaveResponse(false, errorMsg));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, request.error));
-                    }
-                }
+                onComplete?.Invoke(Web2WaveHelpers.ParseActionResponse(
+                    request.downloadHandler?.text,
+                    request.result == UnityWebRequest.Result.Success,
+                    request.error));
             }
         }
 
@@ -416,8 +351,9 @@ namespace Web2Wave
                 }
                 else
                 {
-                    Debug.LogError($"Failed to fetch user properties: {request.error}");
-                    onError?.Invoke(request.error);
+                    string errorMsg = Web2WaveHelpers.ExtractErrorMessage(request.downloadHandler?.text, request.error);
+                    Debug.LogError($"Failed to fetch user properties: {errorMsg}");
+                    onError?.Invoke(errorMsg);
                 }
             }
         }
@@ -456,32 +392,10 @@ namespace Web2Wave
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        bool isSuccess = result.ContainsKey("result") && result["result"]?.ToString() == "1";
-                        onComplete?.Invoke(new Web2WaveResponse(isSuccess));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, "Failed to parse response"));
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.downloadHandler.text);
-                        string errorMsg = result.ContainsKey("error_msg") ? result["error_msg"].ToString() : request.error;
-                        onComplete?.Invoke(new Web2WaveResponse(false, errorMsg));
-                    }
-                    catch
-                    {
-                        onComplete?.Invoke(new Web2WaveResponse(false, request.error));
-                    }
-                }
+                onComplete?.Invoke(Web2WaveHelpers.ParseActionResponse(
+                    request.downloadHandler?.text,
+                    request.result == UnityWebRequest.Result.Success,
+                    request.error, "result"));
             }
         }
 
@@ -543,8 +457,9 @@ namespace Web2Wave
                 }
                 else
                 {
-                    Debug.LogError($"Failed to identify user: {request.error}");
-                    onError?.Invoke(request.error);
+                    string errorMsg = Web2WaveHelpers.ExtractErrorMessage(request.downloadHandler?.text, request.error);
+                    Debug.LogError($"Failed to identify user: {errorMsg}");
+                    onError?.Invoke(errorMsg);
                 }
             }
         }
